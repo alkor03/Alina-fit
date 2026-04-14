@@ -1,0 +1,1280 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Alina Fit">
+<meta name="theme-color" content="#0a0a0f">
+<title>Alina Fit</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Unbounded:wght@400;700;900&family=Nunito:wght@400;600;700;800&display=swap');
+
+:root {
+  --bg: #0a0a0f;
+  --surface: #13131c;
+  --surface2: #1a1a26;
+  --border: #252535;
+  --upper: #b57bee;
+  --lower: #f06292;
+  --back: #4fc3f7;
+  --full: #4db6ac;
+  --rest: #546e7a;
+  --walk: #ffca28;
+  --text: #f0eeff;
+  --muted: #7b7b9a;
+  --dim: #9898b8;
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bot: env(safe-area-inset-bottom, 0px);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+html, body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Nunito', sans-serif;
+  height: 100%;
+  overflow: hidden;
+  user-select: none;
+}
+
+/* ── App shell ─────────────────────────────── */
+#app {
+  display: flex;
+  flex-direction: column;
+  height: 100dvh;
+  max-width: 430px;
+  margin: 0 auto;
+  position: relative;
+  overflow: hidden;
+}
+
+/* ── Top bar ───────────────────────────────── */
+#topbar {
+  padding: calc(var(--safe-top) + 14px) 20px 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+  background: var(--bg);
+  border-bottom: 1px solid var(--border);
+  z-index: 10;
+}
+#topbar h1 {
+  font-family: 'Unbounded', sans-serif;
+  font-size: 18px;
+  font-weight: 900;
+  background: linear-gradient(135deg, var(--upper), var(--lower));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  letter-spacing: -0.5px;
+}
+.topbar-sub {
+  font-size: 11px;
+  color: var(--muted);
+  font-weight: 600;
+  letter-spacing: 0.3px;
+}
+
+/* ── Pages ─────────────────────────────────── */
+#pages {
+  flex: 1;
+  overflow: hidden;
+  position: relative;
+}
+.page {
+  position: absolute;
+  inset: 0;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 16px 16px calc(var(--safe-bot) + 80px);
+  display: none;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+.page.active {
+  display: block;
+  opacity: 1;
+}
+
+/* ── Bottom nav ────────────────────────────── */
+#nav {
+  flex-shrink: 0;
+  display: flex;
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+  padding-bottom: var(--safe-bot);
+  z-index: 10;
+}
+.nav-btn {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  padding: 10px 0 8px;
+  border: none;
+  background: none;
+  cursor: pointer;
+  color: var(--muted);
+  font-family: 'Nunito', sans-serif;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  transition: color 0.2s;
+}
+.nav-btn.active { color: var(--upper); }
+.nav-icon { font-size: 22px; line-height: 1; }
+
+/* ── Section headers ───────────────────────── */
+.section-head {
+  margin-bottom: 16px;
+}
+.section-head h2 {
+  font-family: 'Unbounded', sans-serif;
+  font-size: 20px;
+  font-weight: 900;
+  letter-spacing: -0.5px;
+}
+.section-head p {
+  font-size: 12px;
+  color: var(--muted);
+  margin-top: 3px;
+  font-weight: 600;
+}
+
+/* ── Week tabs ─────────────────────────────── */
+.week-tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+.week-tabs::-webkit-scrollbar { display: none; }
+.wtab {
+  flex-shrink: 0;
+  padding: 7px 14px;
+  border-radius: 20px;
+  border: 1.5px solid var(--border);
+  background: none;
+  color: var(--muted);
+  font-family: 'Nunito', sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.wtab.active {
+  background: var(--upper);
+  border-color: var(--upper);
+  color: white;
+}
+
+/* ── Day cards ─────────────────────────────── */
+.day-card {
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: 16px;
+  margin-bottom: 10px;
+  overflow: hidden;
+  transition: transform 0.15s;
+}
+.day-card:active { transform: scale(0.98); }
+.day-card.completed {
+  opacity: 0.6;
+  border-color: var(--full);
+}
+
+.day-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  cursor: pointer;
+}
+.day-color-dot {
+  width: 10px; height: 10px;
+  border-radius: 3px;
+  flex-shrink: 0;
+}
+.day-dow {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--muted);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  min-width: 24px;
+}
+.day-title {
+  font-family: 'Unbounded', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  flex: 1;
+}
+.day-chevron {
+  font-size: 12px;
+  color: var(--muted);
+  transition: transform 0.2s;
+}
+.day-card.open .day-chevron { transform: rotate(180deg); }
+.day-done-badge {
+  font-size: 16px;
+}
+
+.day-body {
+  display: none;
+  padding: 0 16px 14px;
+}
+.day-card.open .day-body { display: block; }
+
+.walk-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: rgba(255,202,40,0.1);
+  border: 1px solid rgba(255,202,40,0.3);
+  border-radius: 20px;
+  padding: 4px 10px;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--walk);
+  margin-bottom: 12px;
+}
+
+.ex-list { display: flex; flex-direction: column; gap: 6px; }
+.ex-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--surface2);
+  border-radius: 10px;
+  padding: 10px 12px;
+}
+.ex-name { font-size: 13px; font-weight: 700; color: var(--dim); }
+.ex-val { font-size: 13px; font-weight: 800; color: var(--text); }
+.ex-start-btn {
+  background: var(--upper);
+  border: none;
+  border-radius: 8px;
+  padding: 6px 12px;
+  color: white;
+  font-family: 'Nunito', sans-serif;
+  font-size: 11px;
+  font-weight: 800;
+  cursor: pointer;
+  margin-left: 8px;
+  white-space: nowrap;
+  transition: opacity 0.2s;
+}
+.ex-start-btn:active { opacity: 0.7; }
+
+.rest-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: 16px;
+  padding: 16px;
+  margin-bottom: 10px;
+  opacity: 0.5;
+}
+.rest-emoji { font-size: 24px; }
+.rest-info { flex: 1; }
+.rest-title { font-family: 'Unbounded', sans-serif; font-size: 13px; font-weight: 700; color: var(--muted); }
+.rest-sub { font-size: 11px; color: var(--rest); margin-top: 2px; font-weight: 600; }
+
+.mark-done-btn {
+  width: 100%;
+  margin-top: 12px;
+  padding: 12px;
+  border-radius: 12px;
+  border: none;
+  background: linear-gradient(135deg, var(--upper), var(--lower));
+  color: white;
+  font-family: 'Nunito', sans-serif;
+  font-size: 14px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: opacity 0.2s;
+  letter-spacing: 0.3px;
+}
+.mark-done-btn:active { opacity: 0.8; }
+.mark-done-btn.done {
+  background: var(--full);
+}
+
+/* ── Progress bar ──────────────────────────── */
+.week-progress {
+  background: var(--surface);
+  border-radius: 14px;
+  padding: 14px 16px;
+  margin-bottom: 16px;
+  border: 1.5px solid var(--border);
+}
+.wp-label {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+.wp-bar-bg {
+  background: var(--surface2);
+  border-radius: 6px;
+  height: 8px;
+  overflow: hidden;
+}
+.wp-bar-fill {
+  height: 100%;
+  border-radius: 6px;
+  background: linear-gradient(90deg, var(--upper), var(--lower));
+  transition: width 0.4s ease;
+}
+
+/* ── Timer page ────────────────────────────── */
+.timer-display {
+  text-align: center;
+  padding: 20px 0;
+}
+.timer-circle {
+  width: 200px;
+  height: 200px;
+  margin: 0 auto 20px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.timer-svg {
+  position: absolute;
+  inset: 0;
+  transform: rotate(-90deg);
+}
+.timer-track {
+  fill: none;
+  stroke: var(--surface2);
+  stroke-width: 8;
+}
+.timer-prog {
+  fill: none;
+  stroke: url(#timerGrad);
+  stroke-width: 8;
+  stroke-linecap: round;
+  stroke-dasharray: 565;
+  stroke-dashoffset: 0;
+  transition: stroke-dashoffset 0.5s linear;
+}
+.timer-time {
+  font-family: 'Unbounded', sans-serif;
+  font-size: 40px;
+  font-weight: 900;
+  letter-spacing: -2px;
+  line-height: 1;
+}
+.timer-label {
+  font-size: 12px;
+  color: var(--muted);
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  margin-top: 4px;
+}
+
+.timer-presets {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  margin-bottom: 20px;
+}
+.preset-btn {
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: 12px;
+  padding: 10px 6px;
+  color: var(--dim);
+  font-family: 'Nunito', sans-serif;
+  font-size: 12px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: all 0.15s;
+  text-align: center;
+}
+.preset-btn:active, .preset-btn.sel {
+  background: var(--upper);
+  border-color: var(--upper);
+  color: white;
+}
+
+.timer-controls {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+}
+.timer-btn {
+  width: 64px; height: 64px;
+  border-radius: 50%;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.1s, opacity 0.2s;
+}
+.timer-btn:active { transform: scale(0.9); }
+.timer-btn.play {
+  background: linear-gradient(135deg, var(--upper), var(--lower));
+  color: white;
+  width: 72px; height: 72px;
+  font-size: 28px;
+}
+.timer-btn.reset {
+  background: var(--surface2);
+  color: var(--muted);
+}
+
+.sets-counter {
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: 16px;
+  padding: 16px;
+  margin-top: 20px;
+  text-align: center;
+}
+.sets-title {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--muted);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  margin-bottom: 12px;
+}
+.sets-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+}
+.sets-num {
+  font-family: 'Unbounded', sans-serif;
+  font-size: 36px;
+  font-weight: 900;
+  color: var(--upper);
+  min-width: 60px;
+}
+.sets-ctrl {
+  width: 44px; height: 44px;
+  border-radius: 12px;
+  border: none;
+  background: var(--surface2);
+  color: var(--text);
+  font-size: 22px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s;
+}
+.sets-ctrl:active { background: var(--upper); }
+
+/* ── Diary page ────────────────────────────── */
+.diary-entry {
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: 16px;
+  padding: 14px 16px;
+  margin-bottom: 10px;
+}
+.diary-date {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--muted);
+  letter-spacing: 0.5px;
+  margin-bottom: 6px;
+}
+.diary-text {
+  font-size: 14px;
+  color: var(--text);
+  line-height: 1.5;
+  font-weight: 600;
+}
+.diary-mood {
+  margin-top: 8px;
+  display: flex;
+  gap: 6px;
+}
+.mood-chip {
+  font-size: 11px;
+  padding: 3px 8px;
+  border-radius: 20px;
+  font-weight: 700;
+}
+
+.diary-form {
+  background: var(--surface);
+  border: 1.5px solid var(--upper);
+  border-radius: 16px;
+  padding: 16px;
+  margin-bottom: 16px;
+}
+.diary-form h3 {
+  font-family: 'Unbounded', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  margin-bottom: 12px;
+  color: var(--upper);
+}
+.diary-textarea {
+  width: 100%;
+  background: var(--surface2);
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  padding: 10px 12px;
+  color: var(--text);
+  font-family: 'Nunito', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  resize: none;
+  height: 90px;
+  outline: none;
+  margin-bottom: 10px;
+}
+.diary-textarea:focus { border-color: var(--upper); }
+.mood-select {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+.mood-btn {
+  padding: 6px 12px;
+  border-radius: 20px;
+  border: 1.5px solid var(--border);
+  background: none;
+  color: var(--muted);
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.15s;
+  font-family: 'Nunito', sans-serif;
+  font-weight: 700;
+}
+.mood-btn.sel {
+  border-color: var(--upper);
+  background: rgba(181,123,238,0.15);
+  color: var(--upper);
+}
+.diary-save {
+  width: 100%;
+  padding: 11px;
+  border-radius: 10px;
+  border: none;
+  background: var(--upper);
+  color: white;
+  font-family: 'Nunito', sans-serif;
+  font-size: 14px;
+  font-weight: 800;
+  cursor: pointer;
+}
+.diary-save:active { opacity: 0.8; }
+
+.empty-diary {
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--muted);
+  font-size: 14px;
+  font-weight: 600;
+}
+.empty-diary .emoji { font-size: 40px; margin-bottom: 10px; }
+
+/* ── Stats page ────────────────────────────── */
+.stats-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+.stat-card {
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: 14px;
+  padding: 14px;
+}
+.stat-val {
+  font-family: 'Unbounded', sans-serif;
+  font-size: 26px;
+  font-weight: 900;
+  line-height: 1;
+  margin-bottom: 4px;
+}
+.stat-label {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--muted);
+  letter-spacing: 0.3px;
+}
+
+.progress-table {
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: 16px;
+  overflow: hidden;
+}
+.pt-title {
+  padding: 14px 16px 10px;
+  font-family: 'Unbounded', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--upper);
+}
+.pt-row {
+  display: flex;
+  align-items: center;
+  padding: 10px 16px;
+  border-top: 1px solid var(--border);
+  gap: 8px;
+}
+.pt-name { flex: 1; font-size: 12px; font-weight: 700; color: var(--dim); }
+.pt-from { font-size: 12px; color: var(--muted); font-weight: 600; }
+.pt-arrow { color: var(--border); font-size: 11px; }
+.pt-to { font-size: 13px; font-weight: 800; color: var(--full); }
+
+/* ── Modal / overlay ───────────────────────── */
+#modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.7);
+  backdrop-filter: blur(8px);
+  z-index: 100;
+  display: none;
+  align-items: flex-end;
+  justify-content: center;
+}
+#modal.open { display: flex; }
+.modal-sheet {
+  background: var(--surface);
+  border-radius: 24px 24px 0 0;
+  width: 100%;
+  max-width: 430px;
+  padding: 20px 20px calc(var(--safe-bot) + 20px);
+  border-top: 1px solid var(--border);
+  animation: slideUp 0.3s ease;
+}
+@keyframes slideUp {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+.modal-handle {
+  width: 36px; height: 4px;
+  background: var(--border);
+  border-radius: 2px;
+  margin: 0 auto 16px;
+}
+.modal-title {
+  font-family: 'Unbounded', sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+.modal-sub {
+  font-size: 12px;
+  color: var(--muted);
+  font-weight: 600;
+  margin-bottom: 16px;
+}
+.modal-ex-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px; }
+.modal-ex-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--surface2);
+  border-radius: 10px;
+  padding: 10px 14px;
+}
+.modal-close {
+  width: 100%;
+  padding: 13px;
+  border-radius: 12px;
+  border: none;
+  background: var(--surface2);
+  color: var(--muted);
+  font-family: 'Nunito', sans-serif;
+  font-size: 14px;
+  font-weight: 800;
+  cursor: pointer;
+  margin-top: 4px;
+}
+</style>
+</head>
+<body>
+<div id="app">
+
+  <div id="topbar">
+    <div>
+      <h1>ALINA FIT</h1>
+    </div>
+    <div class="topbar-sub" id="todayLabel">загрузка...</div>
+  </div>
+
+  <div id="pages">
+
+    <!-- ── PAGE: CALENDAR ── -->
+    <div class="page active" id="page-cal">
+      <div class="section-head">
+        <h2>Тренировки</h2>
+        <p>Нажми на день, чтобы открыть</p>
+      </div>
+
+      <div class="week-tabs" id="weekTabs"></div>
+      <div class="week-progress">
+        <div class="wp-label">
+          <span id="wpLabel">Прогресс недели</span>
+          <span id="wpCount" style="color:var(--upper)">0 / 4</span>
+        </div>
+        <div class="wp-bar-bg"><div class="wp-bar-fill" id="wpBar" style="width:0%"></div></div>
+      </div>
+      <div id="weekDays"></div>
+    </div>
+
+    <!-- ── PAGE: TIMER ── -->
+    <div class="page" id="page-timer">
+      <div class="section-head">
+        <h2>Таймер</h2>
+        <p>Отдых между подходами</p>
+      </div>
+
+      <div class="timer-display">
+        <div class="timer-circle">
+          <svg class="timer-svg" viewBox="0 0 200 200">
+            <defs>
+              <linearGradient id="timerGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stop-color="#b57bee"/>
+                <stop offset="100%" stop-color="#f06292"/>
+              </linearGradient>
+            </defs>
+            <circle class="timer-track" cx="100" cy="100" r="90"/>
+            <circle class="timer-prog" id="timerCircle" cx="100" cy="100" r="90"/>
+          </svg>
+          <div>
+            <div class="timer-time" id="timerDisplay">01:30</div>
+            <div class="timer-label" id="timerStatus">готов</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="timer-presets">
+        <button class="preset-btn" onclick="setTimer(30)">30с</button>
+        <button class="preset-btn sel" onclick="setTimer(60)">1 мин</button>
+        <button class="preset-btn" onclick="setTimer(90)">1:30</button>
+        <button class="preset-btn" onclick="setTimer(120)">2 мин</button>
+      </div>
+
+      <div class="timer-controls">
+        <button class="timer-btn reset" onclick="resetTimer()">↺</button>
+        <button class="timer-btn play" id="playBtn" onclick="toggleTimer()">▶</button>
+        <button class="timer-btn reset" onclick="setTimer(timerTotal)">⏱</button>
+      </div>
+
+      <div class="sets-counter">
+        <div class="sets-title">Подходы выполнено</div>
+        <div class="sets-row">
+          <button class="sets-ctrl" onclick="changeSets(-1)">−</button>
+          <div class="sets-num" id="setsNum">0</div>
+          <button class="sets-ctrl" onclick="changeSets(1)">+</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── PAGE: DIARY ── -->
+    <div class="page" id="page-diary">
+      <div class="section-head">
+        <h2>Дневник</h2>
+        <p>Записывай ощущения и результаты</p>
+      </div>
+
+      <div class="diary-form">
+        <h3>+ Новая запись</h3>
+        <textarea class="diary-textarea" id="diaryText" placeholder="Как прошла тренировка? Что чувствуешь?"></textarea>
+        <div class="mood-select" id="moodSelect">
+          <button class="mood-btn" onclick="selMood(this,'💪 Огонь!')">💪 Огонь!</button>
+          <button class="mood-btn" onclick="selMood(this,'😊 Хорошо')">😊 Хорошо</button>
+          <button class="mood-btn" onclick="selMood(this,'😐 Норм')">😐 Норм</button>
+          <button class="mood-btn" onclick="selMood(this,'😴 Устала')">😴 Устала</button>
+        </div>
+        <button class="diary-save" onclick="saveDiary()">Сохранить запись</button>
+      </div>
+
+      <div id="diaryList"></div>
+    </div>
+
+    <!-- ── PAGE: STATS ── -->
+    <div class="page" id="page-stats">
+      <div class="section-head">
+        <h2>Прогресс</h2>
+        <p>Твои результаты за месяц</p>
+      </div>
+
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-val" id="statDone" style="color:var(--upper)">0</div>
+          <div class="stat-label">тренировок выполнено</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-val" id="statWeek" style="color:var(--lower)">—</div>
+          <div class="stat-label">лучшая неделя</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-val" id="statStreak" style="color:var(--full)">0</div>
+          <div class="stat-label">серия подряд</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-val" style="color:var(--walk)">16</div>
+          <div class="stat-label">тренировок в плане</div>
+        </div>
+      </div>
+
+      <div class="progress-table">
+        <div class="pt-title">Прогрессия весов</div>
+        <div class="pt-row"><div class="pt-name">Верх тела</div><div class="pt-from">2 кг</div><div class="pt-arrow">→</div><div class="pt-to">3 кг</div></div>
+        <div class="pt-row"><div class="pt-name">Выпады / сумо</div><div class="pt-from">4–5 кг</div><div class="pt-arrow">→</div><div class="pt-to">7–8 кг</div></div>
+        <div class="pt-row"><div class="pt-name">Присед со штангой</div><div class="pt-from">12 кг</div><div class="pt-arrow">→</div><div class="pt-to">16 кг</div></div>
+        <div class="pt-row"><div class="pt-name">Румынская тяга</div><div class="pt-from">12 кг</div><div class="pt-arrow">→</div><div class="pt-to">16 кг</div></div>
+        <div class="pt-row"><div class="pt-name">Планка</div><div class="pt-from">30 сек</div><div class="pt-arrow">→</div><div class="pt-to">60 сек</div></div>
+        <div class="pt-row"><div class="pt-name">Подтягивания</div><div class="pt-from">негативные</div><div class="pt-arrow">→</div><div class="pt-to">3 полных</div></div>
+        <div class="pt-row"><div class="pt-name">Отжимания</div><div class="pt-from">3×8</div><div class="pt-arrow">→</div><div class="pt-to">3×14</div></div>
+      </div>
+    </div>
+
+  </div><!-- /pages -->
+
+  <nav id="nav">
+    <button class="nav-btn active" onclick="showPage('cal',this)">
+      <span class="nav-icon">📅</span>План
+    </button>
+    <button class="nav-btn" onclick="showPage('timer',this)">
+      <span class="nav-icon">⏱</span>Таймер
+    </button>
+    <button class="nav-btn" onclick="showPage('diary',this)">
+      <span class="nav-icon">📓</span>Дневник
+    </button>
+    <button class="nav-btn" onclick="showPage('stats',this)">
+      <span class="nav-icon">📊</span>Итоги
+    </button>
+  </nav>
+
+</div><!-- /app -->
+
+<!-- Modal -->
+<div id="modal" onclick="closeModal()">
+  <div class="modal-sheet" onclick="event.stopPropagation()">
+    <div class="modal-handle"></div>
+    <div class="modal-title" id="modalTitle"></div>
+    <div class="modal-sub" id="modalSub"></div>
+    <div class="modal-ex-list" id="modalExList"></div>
+    <button class="modal-close" onclick="closeModal()">Закрыть</button>
+  </div>
+</div>
+
+<script>
+// ── Data ─────────────────────────────────────────────────
+const WEEKS = [
+  { label: 'Нед 1', badge: 'Адаптация' },
+  { label: 'Нед 2', badge: 'Закрепление' },
+  { label: 'Нед 3', badge: 'Прогресс' },
+  { label: 'Нед 4', badge: 'Пик' },
+];
+
+const DOW = ['ПН','ВТ','СР','ЧТ','ПТ','СБ','ВС'];
+const COLORS = { upper:'#b57bee', lower:'#f06292', back:'#4fc3f7', full:'#4db6ac', rest:'#546e7a' };
+
+const PLAN = [
+  // Week 1
+  [
+    {type:'upper', title:'ВЕРХ ТЕЛА', dow:'ПН', ex:[
+      ['Жим гантелей лёжа','3×12 / 2кг'],['Разводка лёжа','3×12 / 2кг'],
+      ['Жим гантелей стоя','3×12 / 2кг'],['Подъём в стороны','3×15 / 2кг'],
+      ['Французский жим','3×12 / 2кг'],['Отжимания','3×8'],
+    ]},
+    {type:'rest', title:'Отдых', dow:'ВТ', ex:[]},
+    {type:'lower', title:'НИЗ ТЕЛА', dow:'СР', ex:[
+      ['Присед со штангой','3×12 / 12кг'],['Румынская тяга','3×12 / 12кг'],
+      ['Выпады','3×12 / 4кг'],['Сумо-приседания','3×15 / 5кг'],
+      ['Ягодичный мост','3×20'],['Подъёмы на носки','3×20'],
+    ]},
+    {type:'rest', title:'Отдых', dow:'ЧТ', ex:[]},
+    {type:'back', title:'СПИНА', dow:'ПТ', ex:[
+      ['Тяга в наклоне','3×12 / 2кг'],['Тяга одной рукой','3×12 / 2кг'],
+      ['Сгибания на бицепс','3×12 / 2кг'],['Вис на турнике','3×25с'],
+      ['Негативные подтяг.','3×5'],['Брусья (с помощью)','3×8'],
+    ]},
+    {type:'full', title:'ФУЛБОДИ', dow:'СБ', ex:[
+      ['Берпи','3×10'],['Присед + жим','3×12 / 2кг'],
+      ['Планка','3×30с'],['Скручивания','3×15'],
+      ['Дорожка','10 мин'],
+    ]},
+    {type:'rest', title:'Отдых', dow:'ВС', ex:[]},
+  ],
+  // Week 2
+  [
+    {type:'upper', title:'ВЕРХ ТЕЛА', dow:'ПН', ex:[
+      ['Жим гантелей лёжа','3×14 / 2кг'],['Разводка лёжа','3×14 / 2кг'],
+      ['Жим гантелей стоя','3×14 / 2кг'],['Подъём в стороны','3×15 / 2кг'],
+      ['Французский жим','3×14 / 2кг'],['Отжимания','3×10'],
+    ]},
+    {type:'rest', title:'Отдых', dow:'ВТ', ex:[]},
+    {type:'lower', title:'НИЗ ТЕЛА', dow:'СР', ex:[
+      ['Присед со штангой','3×14 / 12кг'],['Румынская тяга','3×14 / 12кг'],
+      ['Выпады','3×14 / 4кг'],['Сумо-приседания','3×15 / 5кг'],
+      ['Ягодичный мост','3×22'],['Подъёмы на носки','3×22'],
+    ]},
+    {type:'rest', title:'Отдых', dow:'ЧТ', ex:[]},
+    {type:'back', title:'СПИНА', dow:'ПТ', ex:[
+      ['Тяга в наклоне','3×14 / 2кг'],['Тяга одной рукой','3×14 / 2кг'],
+      ['Сгибания на бицепс','3×14 / 2кг'],['Вис на турнике','3×30с'],
+      ['Негативные подтяг.','3×5'],['Брусья','3×10'],
+    ]},
+    {type:'full', title:'ФУЛБОДИ', dow:'СБ', ex:[
+      ['Берпи','3×12'],['Присед + жим','3×12 / 2кг'],
+      ['Планка','3×35с'],['Скручивания','3×18'],
+      ['Дорожка','12 мин'],
+    ]},
+    {type:'rest', title:'Отдых', dow:'ВС', ex:[]},
+  ],
+  // Week 3
+  [
+    {type:'upper', title:'ВЕРХ ТЕЛА +', dow:'ПН', ex:[
+      ['Жим гантелей лёжа','4×12 / 3кг'],['Разводка лёжа','4×12 / 3кг'],
+      ['Жим гантелей стоя','4×12 / 3кг'],['Подъём в стороны','3×15 / 3кг'],
+      ['Французский жим','3×12 / 3кг'],['Отжимания','3×12'],
+    ]},
+    {type:'rest', title:'Отдых', dow:'ВТ', ex:[]},
+    {type:'lower', title:'НИЗ ТЕЛА +', dow:'СР', ex:[
+      ['Присед со штангой','4×12 / 16кг'],['Румынская тяга','4×12 / 16кг'],
+      ['Выпады','3×12 / 6кг'],['Сумо-приседания','4×15 / 7кг'],
+      ['Ягодичный мост','3×25'],['Подъёмы на носки','3×25'],
+    ]},
+    {type:'rest', title:'Отдых', dow:'ЧТ', ex:[]},
+    {type:'back', title:'СПИНА +', dow:'ПТ', ex:[
+      ['Тяга в наклоне','4×12 / 3кг'],['Тяга одной рукой','4×12 / 3кг'],
+      ['Сгибания на бицепс','4×12 / 3кг'],['Вис на турнике','3×35с'],
+      ['Подтягивания 1–2!','2×2'],['Брусья','3×10'],
+    ]},
+    {type:'full', title:'ФУЛБОДИ +', dow:'СБ', ex:[
+      ['Берпи','3×12'],['Присед + жим','3×14 / 3кг'],
+      ['Планка','3×45с'],['Скручивания','3×20'],
+      ['Дорожка','15 мин'],
+    ]},
+    {type:'rest', title:'Отдых', dow:'ВС', ex:[]},
+  ],
+  // Week 4
+  [
+    {type:'upper', title:'ВЕРХ ТЕЛА ++', dow:'ПН', ex:[
+      ['Жим гантелей лёжа','4×14 / 3кг'],['Разводка лёжа','4×14 / 3кг'],
+      ['Жим гантелей стоя','4×14 / 3кг'],['Подъём в стороны','4×15 / 3кг'],
+      ['Французский жим','4×14 / 3кг'],['Отжимания','3×14'],
+    ]},
+    {type:'rest', title:'Отдых', dow:'ВТ', ex:[]},
+    {type:'lower', title:'НИЗ ТЕЛА ++', dow:'СР', ex:[
+      ['Присед со штангой','4×14 / 16кг'],['Румынская тяга','4×14 / 16кг'],
+      ['Выпады','4×14 / 7кг'],['Сумо-приседания','4×15 / 8кг'],
+      ['Ягодичный мост','4×25'],['Подъёмы на носки','3×25'],
+    ]},
+    {type:'rest', title:'Отдых', dow:'ЧТ', ex:[]},
+    {type:'back', title:'СПИНА ++', dow:'ПТ', ex:[
+      ['Тяга в наклоне','4×14 / 3кг'],['Тяга одной рукой','4×14 / 3кг'],
+      ['Сгибания на бицепс','4×14 / 3кг'],['Вис на турнике','3×40с'],
+      ['Подтягивания 3!','3×3'],['Брусья','3×12'],
+    ]},
+    {type:'full', title:'ФУЛБОДИ ++', dow:'СБ', ex:[
+      ['Берпи','4×12'],['Присед + жим','4×14 / 3кг'],
+      ['Планка','3×60с'],['Скручивания','3×20'],
+      ['Дорожка','20 мин'],
+    ]},
+    {type:'rest', title:'🏆 Финиш!', dow:'ВС', ex:[]},
+  ],
+];
+
+// ── State ─────────────────────────────────────────────────
+let currentWeek = 0;
+let selectedMood = '';
+let timerInterval = null;
+let timerTotal = 90;
+let timerLeft = 90;
+let timerRunning = false;
+let setsCount = 0;
+
+function getState() {
+  try { return JSON.parse(localStorage.getItem('alina_fit') || '{}'); } catch { return {}; }
+}
+function saveState(s) {
+  try { localStorage.setItem('alina_fit', JSON.stringify(s)); } catch {}
+}
+
+// ── Navigation ────────────────────────────────────────────
+function showPage(id, btn) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('page-' + id).classList.add('active');
+  btn.classList.add('active');
+  if (id === 'stats') renderStats();
+  if (id === 'diary') renderDiary();
+}
+
+// ── Calendar ──────────────────────────────────────────────
+function renderWeekTabs() {
+  const el = document.getElementById('weekTabs');
+  el.innerHTML = WEEKS.map((w, i) =>
+    `<button class="wtab${i===currentWeek?' active':''}" onclick="switchWeek(${i})">${w.label}<br><span style="font-weight:600;color:${i===currentWeek?'rgba(255,255,255,0.7)':'var(--muted)'}; font-size:10px">${w.badge}</span></button>`
+  ).join('');
+}
+
+function switchWeek(i) {
+  currentWeek = i;
+  renderWeekTabs();
+  renderDays();
+}
+
+function renderDays() {
+  const state = getState();
+  const days = PLAN[currentWeek];
+  const el = document.getElementById('weekDays');
+  const completed = days.filter((d,i) => d.type !== 'rest' && state[`w${currentWeek}d${i}`]).length;
+  const total = days.filter(d => d.type !== 'rest').length;
+
+  document.getElementById('wpCount').textContent = `${completed} / ${total}`;
+  document.getElementById('wpBar').style.width = (completed / total * 100) + '%';
+
+  el.innerHTML = days.map((day, di) => {
+    const key = `w${currentWeek}d${di}`;
+    const done = state[key];
+    if (day.type === 'rest') {
+      return `<div class="rest-card">
+        <div class="rest-emoji">${day.title.includes('🏆') ? '🏆' : '💤'}</div>
+        <div class="rest-info">
+          <div class="rest-title">${day.dow} — ${day.title}</div>
+          <div class="rest-sub">Активная ходьба 10 000 шагов</div>
+        </div>
+      </div>`;
+    }
+    const col = COLORS[day.type];
+    return `<div class="day-card${done?' completed':''}" id="dc${di}">
+      <div class="day-header" onclick="toggleDay(${di})">
+        <div class="day-color-dot" style="background:${col}"></div>
+        <div class="day-dow">${day.dow}</div>
+        <div class="day-title" style="color:${col}">${day.title}</div>
+        ${done ? '<div class="day-done-badge">✅</div>' : ''}
+        <div class="day-chevron">▼</div>
+      </div>
+      <div class="day-body">
+        <div class="walk-pill">🚶 10 000 шагов сегодня</div>
+        <div class="ex-list">
+          ${day.ex.map(([n,v]) => `<div class="ex-row">
+            <div class="ex-name">${n}</div>
+            <div style="display:flex;align-items:center;gap:6px">
+              <div class="ex-val">${v}</div>
+              <button class="ex-start-btn" onclick="quickTimer(); event.stopPropagation()">▶ таймер</button>
+            </div>
+          </div>`).join('')}
+        </div>
+        <button class="mark-done-btn${done?' done':''}" onclick="markDone(${di})">
+          ${done ? '✅ Выполнено!' : '🏁 Отметить как выполненное'}
+        </button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function toggleDay(di) {
+  const card = document.getElementById('dc' + di);
+  if (card) card.classList.toggle('open');
+}
+
+function markDone(di) {
+  const state = getState();
+  const key = `w${currentWeek}d${di}`;
+  state[key] = !state[key];
+  saveState(state);
+  renderDays();
+}
+
+function quickTimer() {
+  showPage('timer', document.querySelectorAll('.nav-btn')[1]);
+  setTimer(90);
+  toggleTimer();
+}
+
+// ── Timer ─────────────────────────────────────────────────
+function setTimer(secs) {
+  clearInterval(timerInterval);
+  timerRunning = false;
+  timerTotal = secs;
+  timerLeft = secs;
+  document.getElementById('playBtn').textContent = '▶';
+  document.getElementById('timerStatus').textContent = 'готов';
+  document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('sel'));
+  const labels = [30,60,90,120];
+  const idx = labels.indexOf(secs);
+  if (idx >= 0) document.querySelectorAll('.preset-btn')[idx].classList.add('sel');
+  updateTimerDisplay();
+}
+
+function updateTimerDisplay() {
+  const m = Math.floor(timerLeft / 60);
+  const s = timerLeft % 60;
+  document.getElementById('timerDisplay').textContent =
+    String(m).padStart(2,'0') + ':' + String(s).padStart(2,'0');
+  const pct = timerLeft / timerTotal;
+  const circ = 565;
+  document.getElementById('timerCircle').style.strokeDashoffset = circ * pct;
+}
+
+function toggleTimer() {
+  if (timerRunning) {
+    clearInterval(timerInterval);
+    timerRunning = false;
+    document.getElementById('playBtn').textContent = '▶';
+    document.getElementById('timerStatus').textContent = 'пауза';
+  } else {
+    if (timerLeft <= 0) { timerLeft = timerTotal; }
+    timerRunning = true;
+    document.getElementById('playBtn').textContent = '⏸';
+    document.getElementById('timerStatus').textContent = 'отдыхаем';
+    timerInterval = setInterval(() => {
+      timerLeft--;
+      updateTimerDisplay();
+      if (timerLeft <= 0) {
+        clearInterval(timerInterval);
+        timerRunning = false;
+        document.getElementById('playBtn').textContent = '▶';
+        document.getElementById('timerStatus').textContent = '✅ готово!';
+        setsCount++;
+        document.getElementById('setsNum').textContent = setsCount;
+        try { navigator.vibrate && navigator.vibrate([200,100,200]); } catch {}
+      }
+    }, 1000);
+  }
+}
+
+function resetTimer() {
+  clearInterval(timerInterval);
+  timerRunning = false;
+  timerLeft = timerTotal;
+  document.getElementById('playBtn').textContent = '▶';
+  document.getElementById('timerStatus').textContent = 'готов';
+  updateTimerDisplay();
+}
+
+function changeSets(d) {
+  setsCount = Math.max(0, setsCount + d);
+  document.getElementById('setsNum').textContent = setsCount;
+}
+
+// ── Diary ─────────────────────────────────────────────────
+function selMood(btn, mood) {
+  document.querySelectorAll('.mood-btn').forEach(b => b.classList.remove('sel'));
+  btn.classList.add('sel');
+  selectedMood = mood;
+}
+
+function saveDiary() {
+  const text = document.getElementById('diaryText').value.trim();
+  if (!text) return;
+  const state = getState();
+  if (!state.diary) state.diary = [];
+  const now = new Date();
+  state.diary.unshift({
+    date: now.toLocaleDateString('ru-RU', {day:'numeric',month:'long',year:'numeric'}),
+    text,
+    mood: selectedMood || '😊 Хорошо',
+    ts: Date.now(),
+  });
+  saveState(state);
+  document.getElementById('diaryText').value = '';
+  document.querySelectorAll('.mood-btn').forEach(b => b.classList.remove('sel'));
+  selectedMood = '';
+  renderDiary();
+}
+
+function renderDiary() {
+  const state = getState();
+  const entries = state.diary || [];
+  const el = document.getElementById('diaryList');
+  if (entries.length === 0) {
+    el.innerHTML = `<div class="empty-diary"><div class="emoji">📓</div>Пока нет записей.<br>Напиши что-нибудь после первой тренировки!</div>`;
+    return;
+  }
+  const moodColors = {
+    '💪 Огонь!': '#b57bee',
+    '😊 Хорошо': '#4db6ac',
+    '😐 Норм': '#ffca28',
+    '😴 Устала': '#f06292',
+  };
+  el.innerHTML = entries.map(e => `<div class="diary-entry">
+    <div class="diary-date">${e.date}</div>
+    <div class="diary-text">${e.text}</div>
+    <div class="diary-mood">
+      <span class="mood-chip" style="background:${(moodColors[e.mood]||'#546e7a')}22;color:${moodColors[e.mood]||'#9898b8'}">${e.mood}</span>
+    </div>
+  </div>`).join('');
+}
+
+// ── Stats ─────────────────────────────────────────────────
+function renderStats() {
+  const state = getState();
+  let total = 0, streak = 0, best = 0;
+  const weekCounts = [0,0,0,0];
+  for (let w = 0; w < 4; w++) {
+    let wc = 0;
+    for (let d = 0; d < 7; d++) {
+      if (PLAN[w][d].type !== 'rest' && state[`w${w}d${d}`]) {
+        total++; wc++;
+      }
+    }
+    weekCounts[w] = wc;
+    if (wc > best) best = wc;
+  }
+  let s = 0;
+  outer: for (let w = 0; w < 4; w++) {
+    for (let d = 0; d < 7; d++) {
+      if (PLAN[w][d].type !== 'rest') {
+        if (state[`w${w}d${d}`]) s++;
+        else { streak = Math.max(streak, s); s = 0; }
+      }
+    }
+  }
+  streak = Math.max(streak, s);
+  document.getElementById('statDone').textContent = total;
+  document.getElementById('statStreak').textContent = streak;
+  const bi = weekCounts.indexOf(best);
+  document.getElementById('statWeek').textContent = best > 0 ? `Нед ${bi+1}` : '—';
+}
+
+// ── Init ──────────────────────────────────────────────────
+function init() {
+  const now = new Date();
+  const days = ['Вс','Пн','Вт','Ср','Чт','Пт','Сб'];
+  const months = ['янв','фев','мар','апр','май','июн','июл','авг','сен','окт','ноя','дек'];
+  document.getElementById('todayLabel').textContent =
+    `${days[now.getDay()]}, ${now.getDate()} ${months[now.getMonth()]}`;
+
+  renderWeekTabs();
+  renderDays();
+  updateTimerDisplay();
+  renderDiary();
+}
+
+function closeModal() {
+  document.getElementById('modal').classList.remove('open');
+}
+
+init();
+</script>
+</body>
+</html>
